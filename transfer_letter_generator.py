@@ -4,6 +4,7 @@ from io import BytesIO
 
 st.set_page_config(page_title="Μεταφορά Παραγωγής", layout="centered")
 
+# 🔹 Κωδικοί Brokers Union
 BROKERS_UNION_CODES = {
     "AIG": "B2038",
     "Interasco": "20719",
@@ -38,15 +39,46 @@ BROKERS_UNION_CODES = {
     "ΔΥΝΑΜΙΣ": "D009560",
 }
 
+# 🔹 Defaults
 DEFAULT_SUBCODE = "13041"
 DEFAULT_NAME = "Χρήστος Ιατρόπουλος"
 
 st.title("Αίτημα Μεταφοράς Παραγωγής")
 
+# =========================
+# 🔹 Παραλήπτης (Dynamic)
+# =========================
+st.subheader("Στοιχεία παραλήπτη")
+
+recipient_name = st.text_input(
+    "Γραφείο / Εταιρεία",
+    value="CA Insurance Brokers"
+)
+
+recipient_address = st.text_input(
+    "Διεύθυνση",
+    value="Λεωφόρος Κηφισίας 119, Τ.Κ. 151 24, Μαρούσι, Ελλάδα"
+)
+
+recipient_phone = st.text_input(
+    "Τηλέφωνο",
+    value="+30 210 6100990"
+)
+
+recipient_email = st.text_input(
+    "Email",
+    value="info@ca-brokers.gr"
+)
+
+# =========================
+# 🔹 Στοιχεία μεταφοράς
+# =========================
+st.subheader("Στοιχεία μεταφοράς")
+
 company = st.selectbox("Εταιρεία", list(BROKERS_UNION_CODES.keys()))
 
 old_company_code = st.text_input(
-    "Κωδικός στην εταιρεία από την οποία ζητείται η μεταφορά",
+    "Κωδικός στην εταιρεία (συμπληρώνεται από το γραφείο)",
     value="____________"
 )
 
@@ -58,7 +90,18 @@ brokers_union_code = st.text_input(
 subcode = st.text_input("Υποκωδικός", value=DEFAULT_SUBCODE)
 name = st.text_input("Ονοματεπώνυμο", value=DEFAULT_NAME)
 
-text = f"""Παρακαλώ για τη μεταφορά της παραγωγής μου, την οποία διατηρώ στην εταιρεία {company} με κωδικό {old_company_code}, στην Brokers Union με κωδικό {brokers_union_code}, στον υποκωδικό {subcode} – {name}.
+# =========================
+# 🔹 Κείμενο
+# =========================
+text = f"""Προς:
+{recipient_name}
+{recipient_address}
+Τηλ.: {recipient_phone}
+Email: {recipient_email}
+
+Θέμα: Αίτημα μεταφοράς παραγωγής από την {company}
+
+Παρακαλώ για τη μεταφορά της παραγωγής μου, την οποία διατηρώ στην εταιρεία {company} με κωδικό {old_company_code}, στην Brokers Union με κωδικό {brokers_union_code}, στον υποκωδικό {subcode} – {name}.
 
 Ακόμη, έχω ενημερώσει το πελατολόγιό μου τηλεφωνικά για την αλλαγή της εξυπηρέτησής τους και έχω λάβει τη συγκατάθεσή τους.
 
@@ -72,9 +115,15 @@ text = f"""Παρακαλώ για τη μεταφορά της παραγωγή
 st.subheader("Έτοιμο κείμενο")
 st.text_area("Κείμενο προς αποστολή", text, height=350)
 
+# =========================
+# 🔹 Word Export
+# =========================
 def create_word_file(content):
     doc = Document()
+    
+    doc.add_heading('ΑΙΤΗΜΑ ΜΕΤΑΦΟΡΑΣ ΠΑΡΑΓΩΓΗΣ', 0)
     doc.add_paragraph(content)
+
     buffer = BytesIO()
     doc.save(buffer)
     buffer.seek(0)
@@ -85,13 +134,13 @@ word_file = create_word_file(text)
 st.download_button(
     "Κατέβασμα σε Word",
     word_file,
-    file_name=f"aitima_metaforas_paragogis_{company}.docx",
+    file_name=f"metafora_paragogis_{company}.docx",
     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 )
 
 st.download_button(
     "Κατέβασμα σε TXT",
     text,
-    file_name=f"aitima_metaforas_paragogis_{company}.txt",
+    file_name=f"metafora_paragogis_{company}.txt",
     mime="text/plain"
 )
